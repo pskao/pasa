@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Human verification</title>
+
+  <style>
+    form {
+      width: 300px;
+      margin: 20px auto;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button[type="submit"] {
+      padding: 10px;
+      background-color: #428bca;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #generated-captcha {
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    @media only screen and (max-width: 600px) {
+      form {
+        width: 90%;
+      }
+    }
+
+    @media only screen and (max-width: 768px) {
+      #captchaCanvas {
+        width: 80%;
+      }
+
+      input[type="text"] {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <form>
+    <canvas id="captchaCanvas" width="200" height="80"></canvas>
+    <label for="captcha">Saisissez le texte du captcha:</label>
+    <input type="text" id="captcha" name="captcha">
+    <br>
+    <button type="submit">Régulariser</button>
+  </form>
+
+  <script>
+    let captcha = "";
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const canvas = document.getElementById("captchaCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generateCaptcha() {
+      captcha = "";
+      for (let i = 0; i < 4; i++) {
+        captcha += possible.charAt(getRandomInt(0, possible.length - 1));
+      }
+    }
+
+    function drawCaptcha() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const styles = ["24px Arial", "20px Verdana", "28px Times New Roman", "bold 32px Helvetica"];
+      const colors = ["#FF0000", "#FFA500", "#008000", "#0000FF", "#4B0082", "#800080"];
+      const positions = [
+        { x: 20, y: 40 },
+        { x: 80, y: 30 },
+        { x: 140, y: 50 },
+        { x: 50, y: 70 },
+        { x: 110, y: 20 },
+        { x: 170, y: 60 },
+      ];
+
+      for (let i = 0; i < captcha.length; i++) {
+        const style = styles[Math.floor(Math.random() * styles.length)];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const position = positions[i];
+        ctx.font = style;
+        ctx.fillStyle = color;
+        ctx.fillText(captcha[i], position?.x, position?.y);
+      }
+    }
+
+    function resetCaptcha() {
+      generateCaptcha();
+      drawCaptcha();
+      document.getElementById("captcha").value = "";
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      resetCaptcha();
+    });
+
+    const form = document.querySelector("form");
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const userAnswer = document.getElementById("captcha").value.trim();
+
+      if (captcha.split("").every((letter) => userAnswer.toLowerCase().includes(letter.toLowerCase()))) {
+        window.location.href = '';
+      } else {
+        resetCaptcha();
+        const capInput = document.getElementById("captcha");
+        capInput.value = "";
+      }
+    });
+  </script>
+</body>
+
+</html>
